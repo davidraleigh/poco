@@ -17,7 +17,7 @@ LINKMODE ?= STATIC
 # If the SDK is defined use it
 # Otherwise find the latest version installed
 #
-# IPHONE_SDK_VERSION = 2.2.1
+IPHONE_SDK_VERSION = 6.0
 
 # if IPHONE_SDK_VERSION_MIN is defined use that
 # Otherwise use the version found. 
@@ -29,7 +29,7 @@ IPHONE_SDK_BASE         = $(shell ls -d $(IPHONE_SDK_ROOT_DIR)$(IPHONE_SDK_VERSI
 IPHONE_SDK_VERSION_MIN ?= $(patsubst %.sdk,%,$(patsubst $(IPHONE_SDK_ROOT_DIR)%,%,$(IPHONE_SDK_BASE)))
 
 POCO_TARGET_OSNAME     ?= $(IPHONE_SDK)
-POCO_TARGET_OSARCH     ?= armv6
+POCO_TARGET_OSARCH     ?= armv7
 TOOL_PREFIX            ?= $(shell xcode-select -print-path)/Platforms/$(IPHONE_SDK).platform/Developer/usr/bin
 OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BASE) -mthumb -miphoneos-version-min=$(IPHONE_SDK_VERSION_MIN)
 
@@ -39,8 +39,11 @@ OSFLAGS                ?= -arch $(POCO_TARGET_OSARCH) -isysroot $(IPHONE_SDK_BAS
 # If GCC_VER is defined then use it.
 # Otherwise select the latest version
 #
-CC		= $(shell ls $(TOOL_PREFIX)/llvm-gcc-$(GCC_VER)* | tail -1)
-CXX		= $(shell ls $(TOOL_PREFIX)/llvm-g++-$(GCC_VER)* | tail -1)
+# CC        = $(shell ls $(TOOL_PREFIX)/llvm-gcc-$(GCC_VER)* | tail -1)
+# CXX       = $(shell ls $(TOOL_PREFIX)/llvm-g++-$(GCC_VER)* | tail -1)
+CC      = $(shell xcode-select -print-path)/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
+CXX     = $(shell xcode-select -print-path)/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
+
 
 LINK    = $(CXX) -bind_at_load
 LIB     = libtool -static -o
@@ -67,7 +70,7 @@ SHAREDLIBLINKEXT = .dylib
 CFLAGS          = $(OSFLAGS)
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = $(OSFLAGS) -Wall -Wno-sign-compare 
+CXXFLAGS        = $(OSFLAGS) -Wall -Wno-sign-compare -std=c++11 -stdlib=libc++
 CXXFLAGS32      =
 CXXFLAGS64      = 
 LINKFLAGS       = $(OSFLAGS)
@@ -94,4 +97,4 @@ SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_STAT64 -DPOCO_NO_S
 #
 # System Specific Libraries
 #
-SYSLIBS  = -ldl
+SYSLIBS  = -ldl -lc++
